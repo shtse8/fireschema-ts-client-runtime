@@ -200,17 +200,18 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Clear collections before terminating
-  console.log('Cleaning up test collections...');
-  await cleanupCollection(testCollection.ref);
-  await cleanupCollection(testCollectionWithSchema.ref);
-  console.log('Test collections cleaned up.');
-
-  // Terminate Firestore connection
+  // Terminate Firestore connection first to ensure handles are closed
+  console.log('Terminating Firestore connection...');
   await terminate(firestore);
   // Delete Firebase App
   await deleteApp(app);
   console.log('Disconnected from Firestore emulator.');
+
+  // Attempt cleanup after termination (might fail gracefully due to closed connection)
+  console.log('Attempting post-termination cleanup...');
+  await cleanupCollection(testCollection.ref);
+  await cleanupCollection(testCollectionWithSchema.ref);
+  console.log('Post-termination cleanup attempted.');
   // process.exit(0); // Force exit in CI - Causes Jest worker crash
 });
 
