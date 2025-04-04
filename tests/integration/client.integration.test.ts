@@ -236,11 +236,6 @@ describe('Client Runtime Integration Tests', () => {
       // ID is not part of the data payload itself in Firestore
       expect(retrievedData).toEqual(expect.objectContaining(dataToAdd)); // Then check content
 
-    } finally {
-      // Cleanup: delete the added document
-      if (docRef?.id) {
-        await testCollection.delete(docRef.id);
-      }
     }
   });
 
@@ -258,8 +253,8 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrievedData).toEqual(expect.objectContaining(dataToSet));
 
     } finally {
-      // Cleanup
-      await testCollection.delete(docId);
+      // Ensure cleanup happens even if assertions fail mid-test
+      try { await testCollection.delete(docId); } catch (e) {}
     }
   });
 
@@ -311,9 +306,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(names).toContain('Query C');
       expect(names).not.toContain('Query B');
 
-    } finally {
-      // Cleanup
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -336,9 +328,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(results[0].name).toBe('Apple');
       expect(results[1].name).toBe('Mango');
 
-    } finally {
-      // Cleanup
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -363,8 +352,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(names).toContain('C');
       expect(names).not.toContain('B');
 
-    } finally {
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -391,8 +378,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('X');
 
-    } finally {
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -430,9 +415,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrievedData?.config?.isEnabled).toBe(true);
       expect(retrievedData?.config?.level).toBe(3); // 1 + 2
 
-    } finally {
-      // Cleanup
-      await nestedCollection.delete(docId);
     }
   });
 
@@ -462,8 +444,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(results[0].name).toBe('Two');
       expect(results[1].name).toBe('Three');
 
-    } finally {
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -506,8 +486,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(results).toHaveLength(2);
       expect(results.map((r: TestData) => r.name)).toEqual(expect.arrayContaining(['Val10', 'Val30']));
 
-    } finally {
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -528,8 +506,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('B');
 
-    } finally {
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -554,8 +530,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(names).toContain('Item 2');
       expect(names).toContain('Item 3');
 
-    } finally {
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -587,11 +561,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrievedData?.value).toBe(999); // Check numeric default
       expect(retrievedData?.lastUpdated).toBeInstanceOf(Timestamp);
 
-    } finally {
-      // Cleanup using the same collection reference
-      if (docRefId) {
-        await collectionWithSchema.delete(docRefId);
-      }
     }
   });
 
@@ -618,9 +587,6 @@ describe('Client Runtime Integration Tests', () => {
       // Check that the default value was applied
       expect(retrievedData?.lastUpdated).toBeInstanceOf(Timestamp);
 
-    } finally {
-      // Cleanup using the same collection reference
-      await collectionWithSchema.delete(docId);
     }
   });
 
@@ -659,13 +625,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrievedData?.isActive).toBe(true);
       expect(retrievedData?.lastUpdated).toBeInstanceOf(Timestamp); // Ensure the provided value is still set
 
-    } finally {
-      // Need to clean up potentially added documents
-      const q = query(collectionWithSchema.ref);
-      const snapshot = await getDocs(q);
-      const batch = writeBatch(firestore);
-      snapshot.docs.forEach(doc => batch.delete(doc.ref));
-      await batch.commit();
     }
   });
 
@@ -716,8 +675,6 @@ describe('Client Runtime Integration Tests', () => {
       // Reverted expectation: startAt B (inclusive), endBefore D (exclusive) should yield B, C
       expect(results).toHaveLength(2);
       expect(results.map((r: TestData) => r.name)).toEqual(['B', 'C']);
-    } finally {
-        await cleanupCollection(testCollection.ref);
     }
   }); // <-- Closing brace for this test
 
@@ -741,8 +698,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(results[0].name).toBe('Third'); // Third item has value 3
       expect(results[1].name).toBe('Fourth'); // Fourth item has value 4
 
-    } finally {
-      await cleanupCollection(testCollection.ref);
     }
   });
 
@@ -779,8 +734,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(resultsOrdered).toHaveLength(1);
       expect(resultsOrdered[0].description).toBe('Sub Query B');
 
-    } finally {
-      await testCollection.delete(parentId); // Cleans up subcollection too
     }
   });
 
@@ -808,8 +761,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrievedSubData?.description).toBe('Updated Sub Desc');
       expect(retrievedSubData?.count).toBe(10);
 
-    } finally {
-      await testCollection.delete(parentId);
     }
   });
 
@@ -838,9 +789,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrievedData?.tags).toEqual(['new', 'updated']);
       expect(retrievedData?.lastUpdated).toBeInstanceOf(Timestamp); // Check type
 
-    } finally {
-      // Cleanup
-      await testCollection.delete(docId);
     }
   });
 
@@ -864,9 +812,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrievedData?.tags).toEqual(['a', 'c']);
       expect(retrievedData?.value).toBeUndefined(); // Field should be deleted
 
-    } finally {
-      // Cleanup
-       await testCollection.delete(docId); // Added cleanup
     }
   }); // <-- Closing brace for this test
 
@@ -896,8 +841,6 @@ describe('Client Runtime Integration Tests', () => {
       expect(retrieved?.value).toBe(200); // Value from step 2 persists
       expect(retrieved?.tags).toEqual(['two']); // Tags from step 2 persist
 
-    } finally {
-      await testCollection.delete(docId);
     }
   }); // <-- Closing brace for this test
 
@@ -941,11 +884,6 @@ describe('Client Runtime Integration Tests', () => {
       const retrievedParent = await testCollection.get(parentId);
       expect(retrievedParent).toBeDefined();
 
-    } finally {
-      // Cleanup: Deleting parent should cascade in emulator (usually)
-      // but explicit cleanup is safer if needed.
-      await testCollection.delete(parentId);
-      // Optionally add explicit deletes for sub/sub-sub if needed
     }
   }); // <-- Closing brace for this test
 
@@ -988,9 +926,6 @@ describe('Client Runtime Integration Tests', () => {
       retrievedSubData = await subCollection.get(subDocId);
       expect(retrievedSubData).toBeUndefined();
 
-    } finally {
-      // Cleanup: Delete parent doc (subcollection is deleted automatically)
-      await testCollection.delete(parentId);
     }
   }); // <-- Closing brace for this test
 
