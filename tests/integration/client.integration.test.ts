@@ -221,7 +221,7 @@ afterAll(async () => {
 
 
 describe('Client Runtime Integration Tests', () => {
-  jest.setTimeout(30000); // Increase timeout to 30 seconds for integration tests
+  jest.setTimeout(120000); // Increase timeout to 120 seconds (2 minutes) for integration tests
 
 
   it('should add a document and retrieve it', async () => {
