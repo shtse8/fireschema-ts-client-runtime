@@ -200,12 +200,13 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Terminate Firestore connection first to ensure handles are closed
+  // Delete Firebase App first
+  console.log('Deleting Firebase app instance...');
+  await deleteApp(app);
+  // Then terminate Firestore connection
   console.log('Terminating Firestore connection...');
   await terminate(firestore);
-  // Delete Firebase App
-  await deleteApp(app);
-  console.log('Disconnected from Firestore emulator.');
+  console.log('Disconnected from Firestore emulator and app deleted.');
 
   // Cleanup removed from afterAll to simplify teardown and avoid hangs
   // process.exit(0); // Force exit in CI - Causes Jest worker crash
