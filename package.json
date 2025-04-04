@@ -20,6 +20,10 @@
   ],
   "author": "Your Name <you@example.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shtse8/fireschema-ts-client-runtime.git"
+  },
   "dependencies": {
     "firebase": "^9.0.0 || ^10.0.0 || ^11.0.0"
   },
