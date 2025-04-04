@@ -8,7 +8,7 @@
   "scripts": {
     "clean": "npx rimraf dist",
     "build": "npx rimraf dist && tsc -b",
-    "test": "npx jest --forceExit"
+    "test": "npx jest --detectOpenHandles"
   },
   "keywords": [
     "firestore",
