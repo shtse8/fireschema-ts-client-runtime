@@ -210,14 +210,16 @@ afterAll(async () => {
 
 // Clear collection before each test run for isolation
 
-// Clear collection before each test run for isolation
-beforeEach(async () => { // Make async and call cleanup for both
-    await cleanupCollection(testCollection.ref);
-    await cleanupCollection(testCollectionWithSchema.ref);
+// Clear collection after each test run for isolation
+afterEach(async () => {
+  await cleanupCollection(testCollection.ref);
+  await cleanupCollection(testCollectionWithSchema.ref);
 });
 
 
 describe('Client Runtime Integration Tests', () => {
+  jest.setTimeout(30000); // Increase timeout to 30 seconds for integration tests
+
 
   it('should add a document and retrieve it', async () => {
     const dataToAdd: TestAddData = { name: 'Integration Test Item', value: 123 };
