@@ -212,10 +212,8 @@ afterAll(async () => {
   // process.exit(0); // Force exit in CI - Causes Jest worker crash
 });
 
-// Clear collection before each test run for isolation
-
-// Removed afterEach cleanup, moved to afterAll
-
+// Clear collection before each test run for isolation (Now handled by beforeAll)
+// Removed afterEach cleanup
 
 describe('Client Runtime Integration Tests', () => {
   jest.setTimeout(120000); // Increase timeout to 120 seconds (2 minutes) for integration tests
