@@ -207,11 +207,7 @@ afterAll(async () => {
   await deleteApp(app);
   console.log('Disconnected from Firestore emulator.');
 
-  // Attempt cleanup after termination (might fail gracefully due to closed connection)
-  console.log('Attempting post-termination cleanup...');
-  await cleanupCollection(testCollection.ref);
-  await cleanupCollection(testCollectionWithSchema.ref);
-  console.log('Post-termination cleanup attempted.');
+  // Cleanup removed from afterAll to simplify teardown and avoid hangs
   // process.exit(0); // Force exit in CI - Causes Jest worker crash
 });
 
