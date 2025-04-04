@@ -200,6 +200,12 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // Clear collections before terminating
+  console.log('Cleaning up test collections...');
+  await cleanupCollection(testCollection.ref);
+  await cleanupCollection(testCollectionWithSchema.ref);
+  console.log('Test collections cleaned up.');
+
   // Terminate Firestore connection
   await terminate(firestore);
   // Delete Firebase App
@@ -210,11 +216,7 @@ afterAll(async () => {
 
 // Clear collection before each test run for isolation
 
-// Clear collection after each test run for isolation
-afterEach(async () => {
-  await cleanupCollection(testCollection.ref);
-  await cleanupCollection(testCollectionWithSchema.ref);
-});
+// Removed afterEach cleanup, moved to afterAll
 
 
 describe('Client Runtime Integration Tests', () => {
